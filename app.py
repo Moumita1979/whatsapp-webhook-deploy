@@ -1,16 +1,17 @@
 from flask import Flask, request
 
 app = Flask(__name__)
-
 VERIFY_TOKEN = 'myverifytoken123'
 
 @app.route('/webhook', methods=['GET', 'POST'])
+@app.route('/webhook/', methods=['GET', 'POST'])  # supports both with and without trailing slash
 def webhook():
     if request.method == 'GET':
+        mode = request.args.get('hub.mode')
         token = request.args.get('hub.verify_token')
         challenge = request.args.get('hub.challenge')
-        mode = request.args.get('hub.mode')
-        if token == VERIFY_TOKEN and mode == 'subscribe':
+        
+        if mode == 'subscribe' and token == VERIFY_TOKEN:
             return challenge, 200
         else:
             return 'Verification token mismatch', 403
